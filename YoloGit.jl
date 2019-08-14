@@ -180,16 +180,16 @@ end
 images,labels = inputandlabelsdir(ACC_OUT,ACC_INPUT)
 in,out,imgs = prepareinputlabels(images,labels)
 xtype=(Knet.gpu()>=0 ? Knet.KnetArray{Float32} : Array{Float32})
-#$modeldata = minibatch(in,out,MINIBATCH_SIZE;xtype = xtype)
-#drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
+$modeldata = minibatch(in,out,MINIBATCH_SIZE;xtype = xtype)
+drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
 f = open(WEIGHTS_FILE)
 getweights(model,f)
 
-#indir = inputdir(INPUT)
-#inp,images = prepareinput(indir)
+indir = inputdir(INPUT)
+inp,images = prepareinput(indir)
 
 displaytest(EXAMPLE_INPUT,model)
 
-#@time mAP = accuracy(model,modeldata,0.0,0.3,0.5)
-#@time result = saveoutput(model,drawdata,0.3,0.3)
+@time mAP = accuracy(model,modeldata,0.0,0.3,0.5)
+@time result = saveoutput(model,drawdata,0.3,0.3)
 close(f)

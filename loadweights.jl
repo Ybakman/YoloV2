@@ -1,6 +1,6 @@
 flipkernel(x) = x[end:-1:1, end:-1:1, :, :]
 
-function updateconv!(c::Conv,gama,mean,varriance)
+function updateconv!(c,gama,mean,varriance)
 gama4 = reshape(gama,1,1,1,:)
 varriance4 = reshape(varriance,1,1,1,:)
 gama3 = reshape(gama,1,1,:,1)
@@ -15,7 +15,7 @@ return c.w ,c.b
 end
 
 
-function getweights(model::Chain, file)
+function getweights(model, file)
     readconstants!(f)
     #First Conv layer
     loadconv!(model.layers[1],file,3,3,3,16)
@@ -51,7 +51,7 @@ function getweights(model::Chain, file)
 end
 
 
-function loadconv!(c::Conv,file,d1,d2,d3,d4)
+function loadconv!(c,file,d1,d2,d3,d4)
     read!(file, c.b)
     gama= Array{Float32}(UndefInitializer(), d4);
     mean = Array{Float32}(UndefInitializer(), d4);
