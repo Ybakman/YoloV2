@@ -24,13 +24,15 @@ drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
 @time result = saveoutput(model,drawdata,0.3,0.3; record = true, location = "VocResult")
 display(AP)
 ```
-The code can do:
+Fill the Input folder with jpg images. The program prepares output and put them into output folder. If you want you can save another folder.
+
+The code can:
 
 1-Calculate accuracy on Voc Dataset
 
-2-Takes the images and saves the output into the folder
+2-Tak the images and saves the output into the folder
 
-3-Takes an example image and diplay the output on the IDE.
+3-Take an example image and diplay the output on the IDE.
 
 Here is an example of input and output:
 
