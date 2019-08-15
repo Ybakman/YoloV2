@@ -21,6 +21,7 @@ accdata = minibatch(in,out,MINIBATCH_SIZE;xtype = xtype)
 drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
 
 @time AP = accuracy(model,accdata,0.0,0.3,0.5)
+@time result = saveoutput(model,drawdata,0.3,0.3; record = true, location = "VocResult")
 display(AP)
 ```
 The code can do:
@@ -30,4 +31,7 @@ The code can do:
 2-Takes the images and saves the output into the folder
 
 3-Takes an example image and diplay the output on the IDE.
+
+Here is an example of input and output:
+
 
