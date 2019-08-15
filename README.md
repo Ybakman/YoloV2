@@ -35,7 +35,9 @@ The code can do:
 Here is an example of input and output:
 
 INPUT:
-![](dog.jpg | width=100) 
+<p align="center">
+  <img src="dog.jpg" width="256" height="455">
+</p> 
 
 OUTPUT:
 ![](dogout.png)
