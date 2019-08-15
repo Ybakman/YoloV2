@@ -8,7 +8,6 @@ using Pkg; for p in ("Knet","Random","Glob","FileIO","DelimitedFiles","OffsetArr
 "ImageDraw","ImageMagick","ImageFiltering","ImageTransformations","Colors","FreeTypeAbstraction","QuartzImageIO","LightXML");
 haskey(Pkg.installed(),p) || Pkg.add(p); end
 
-xtype=(Knet.gpu()>=0 ? Knet.KnetArray{Float32} : Array{Float32})#if gpu exists run on gpu
 #Include related files.
 include("inputprocess.jl") #containing functions preparing input
 include("outprocess.jl") # containing functions preparing output
@@ -23,7 +22,7 @@ using LightXML
 using ImageMagick
 
 face = newface("DroidSansMono.ttf") #Font type
-
+xtype=(Knet.gpu()>=0 ? Knet.KnetArray{Float32} : Array{Float32})#if gpu exists run on gpu
 #Yolo V2 pre-trained boxes width and height
 anchors = [(1.08,1.19),  (3.42,4.41),  (6.63,11.38),  (9.42,5.11),  (16.62,10.52)]
 #20 classes on Voc dataset
@@ -31,7 +30,7 @@ numClass = 20
 
 MINIBATCH_SIZE = 1
 WEIGHTS_FILE = "yolov2-tiny-voc.weights" #Pre-trained weights data
-ACC_INPUT = "VOCdevkit/VOC2012/JpegImages" #Input directory for accuracy calculation
+ACC_INPUT = "VOCdevkit/VOC2012/JPEGImages" #Input directory for accuracy calculation
 ACC_OUT =   "VOCdevkit/VOC2012/Annotations" #location of objects as Xml file for accuracy calculation
 INPUT =     "Input"    #Input directory to create output and save
 EXAMPLE_INPUT = "example.jpg" #One input for display
