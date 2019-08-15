@@ -24,7 +24,7 @@ drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
 @time result = saveoutput(model,drawdata,0.3,0.3; record = true, location = "VocResult")
 display(AP)
 ```
-Fill the Input folder with jpg images. The program prepares output and put them into output folder. If you want you can save another folder.
+Fill the Input folder with jpg images. The program prepares output and put them into output folder. If you want you can save output into another folder.
 
 The code can:
 
