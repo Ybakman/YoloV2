@@ -1,4 +1,4 @@
-#This function returns the directory of all images and their xml files including labels
+
 function inputandlabelsdir(dirlab,dirinput)
     labels = []
     images = []
