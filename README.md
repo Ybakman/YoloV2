@@ -34,6 +34,9 @@ The code can do:
 
 Here is an example of input and output:
 
+INPUT:
 ![GitHub Logo](dog.jpg)
 
+OUTPUT:
+![GitHub Logo](dogout.png)
 
