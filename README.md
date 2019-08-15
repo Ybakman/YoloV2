@@ -35,7 +35,7 @@ The code can do:
 Here is an example of input and output:
 
 INPUT:
-![](dog.jpg = 416x416) 
+![](dog.jpg | width=100) 
 
 OUTPUT:
 ![](dogout.png)
