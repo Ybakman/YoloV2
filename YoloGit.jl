@@ -107,7 +107,7 @@ model = Chain(Conv(3,3,3,16,1,1,leaky),
 #post processing function.
 #Confidence score threshold to select correct predictions. Recommended : 0.3
 #IoU threshold to remove unnecessary predictions: Recommended:0.3
-function postprocessing(out,confth,ıouth)
+function postprocessing(out,confth,iouth)
     out = Array{Float32,4}(out)
     result = []
     RATE = 32
@@ -140,18 +140,18 @@ function postprocessing(out,confth,ıouth)
             end
         end
     end
-    result = nonmaxsupression(result,ıouth)
+    result = nonmaxsupression(result,iouth)
     return result
 end
 
 #It removes the predictions overlapping.
-function nonmaxsupression(results,ıouth)
+function nonmaxsupression(results,iouth)
     sort!(results, by = x ->x[6],rev=true)
     for i in 1:length(results)
         k = i+1
         while k <= length(results)
-            if ıoumatch(results[i][1],results[i][2],results[i][3],results[i][4],
-                results[k][1],results[k][2],results[k][3],results[k][4]) > ıouth
+            if ioumatch(results[i][1],results[i][2],results[i][3],results[i][4],
+                results[k][1],results[k][2],results[k][3],results[k][4]) > iouth
                 deleteat!(results,k)
                 k = k - 1
             end
@@ -162,7 +162,7 @@ function nonmaxsupression(results,ıouth)
 end
 
 #It calculates IoU score (overlapping rate)
-function ıoumatch(x1,y1,w1,h1,x2,y2,w2,h2)
+function ioumatch(x1,y1,w1,h1,x2,y2,w2,h2)
         r1 = x1 + w1
         l1 = x1
         t1 = y1

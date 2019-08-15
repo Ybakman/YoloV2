@@ -1,9 +1,9 @@
-function saveoutput(model,data,confth,ıouth; record = true, location = "Output")
+function saveoutput(model,data,confth,iouth; record = true, location = "Output")
     res = []
     number = 0
     for (x,y) in data
         out = model(x)
-        out = postprocessing(out,confth,ıouth)
+        out = postprocessing(out,confth,iouth)
         a = out
         push!(res,a)
         im = y[1]
@@ -37,7 +37,7 @@ function drawsquare(im,x,y,w,h,padding)
     draw!(im, LineSegment(Point(x,y+h), Point(x+w,y+h)))
 end
 
-function accuracy(model,data,confth,ıouth,ıou)
+function accuracy(model,data,confth,iouth,iou)
     predictions = Dict("aeroplane"=>[],"bicycle"=>[],"bird"=>[], "boat"=>[],
                     "bottle"=>[],"bus"=>[],"car"=>[],"cat"=>[],"chair"=>[],
                     "cow"=>[],"diningtable"=>[],"dog"=>[],"horse"=>[],"motorbike"=>[],
@@ -48,11 +48,11 @@ function accuracy(model,data,confth,ıouth,ıou)
                     "person"=>0.0,"pottedplant"=>0.0,"sheep"=>0.0,"sofa"=>0.0,"train"=>0.0,"tvmonitor"=>0.0)
     for (x,y) in data
         out = model(x)
-        out = postprocessing(out,confth,ıouth)
+        out = postprocessing(out,confth,iouth)
         check = zeros(length(y[1])-2)
         sort!(out,by = x-> x[2],rev=true)
         for k in 1:length(out)
-            tp,loc = istrue(out[k],y[1][3:length(y[1])],check,ıou)
+            tp,loc = istrue(out[k],y[1][3:length(y[1])],check,iou)
             push!(predictions[numsdic[out[k][5]]],(tp,out[k][6]))
             if tp
                 check[loc] = 1
@@ -98,13 +98,13 @@ function accuracy(model,data,confth,ıouth,ıou)
     return apdic
 end
 
-function istrue(prediction,labels,check,ıou)
-    min = ıou
+function istrue(prediction,labels,check,iou)
+    min = iou
     result = false
     location = length(labels) + 1
     for i in 1:length(labels)
-        if prediction[5] == namesdic[labels[i][5]] && check[i] == 0 && ıoumatch(prediction[1],prediction[2],prediction[3],prediction[4],labels[i][1],labels[i][2],labels[i][3],labels[i][4]) > min
-            min = ıoumatch(prediction[1],prediction[2],prediction[3],prediction[4],labels[i][1],labels[i][2],labels[i][3],labels[i][4])
+        if prediction[5] == namesdic[labels[i][5]] && check[i] == 0 && ioumatch(prediction[1],prediction[2],prediction[3],prediction[4],labels[i][1],labels[i][2],labels[i][3],labels[i][4]) > min
+            min = ioumatch(prediction[1],prediction[2],prediction[3],prediction[4],labels[i][1],labels[i][2],labels[i][3],labels[i][4])
             result = true
             location = i
         end
