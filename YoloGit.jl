@@ -30,8 +30,8 @@ numClass = 20
 
 MINIBATCH_SIZE = 1
 WEIGHTS_FILE = "yolov2-tiny-voc.weights" #Pre-trained weights data
-ACC_INPUT = "VOCdevkit/VOC2012/JPEGImages" #Input directory for accuracy calculation
-ACC_OUT =   "VOCdevkit/VOC2012/Annotations" #location of objects as Xml file for accuracy calculation
+ACC_INPUT = "VOCdevkit/VOC2007/JPEGImages" #Input directory for accuracy calculation
+ACC_OUT =   "VOCdevkit/VOC2007/Annotations" #location of objects as Xml file for accuracy calculation
 INPUT =     "Input"    #Input directory to create output and save
 EXAMPLE_INPUT = "example.jpg" #One input for display
 
