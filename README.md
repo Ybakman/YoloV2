@@ -36,9 +36,11 @@ Here is an example of input and output:
 
 INPUT:
 <p align="center">
-  <img src="dog.jpg" width="256" height="455">
+  <img src="dog.jpg" width="416" height="416">
 </p> 
 
 OUTPUT:
-![](dogout.png)
+<p align="center">
+  <img src="dogout.png" width="416" height="416">
+</p> 
 
