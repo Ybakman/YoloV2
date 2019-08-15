@@ -1,4 +1,4 @@
-function saveoutput(model,data,confth,ıouth; record = true)
+function saveoutput(model,data,confth,ıouth; record = true, location = "Output")
     res = []
     number = 0
     for (x,y) in data
@@ -12,11 +12,14 @@ function saveoutput(model,data,confth,ıouth; record = true)
         padding = (p1,p2)
         for i in 1:length(a)
             drawsquare(im,a[i][1],a[i][2],a[i][3],a[i][4],padding)
-            FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=RGB4{Float64}(1.0,1.0,1.0),fcolor=RGB4{Float64}(0,0,0)) #use `nothing` to make bcolor transparent
+            FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
         end
         number = number + 1
         if record
-            save("outs/$number.jpg",im[1:end-p2,1:end-p1])
+            if !isdir(location)
+                mkdir(location)
+            end
+            save(string(location,"/$number.jpg"),im[1:end-p2,1:end-p1])
         end
     end
     return res
@@ -118,7 +121,7 @@ function displaytest(file,model; record = false)
     a = postprocessing(res,0.3,0.3)
     for i in 1:length(a)
         drawsquare(im,a[i][1],a[i][2],a[i][3],a[i][4],padding)
-        FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=RGB4{Float64}(1.0,1.0,1.0),fcolor=RGB4{Float64}(0,0,0)) #use `nothing` to make bcolor transparent
+        FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
     end
     p1 = padding[1]
     p2 = padding[2]
