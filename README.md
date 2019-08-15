@@ -35,8 +35,8 @@ The code can do:
 Here is an example of input and output:
 
 INPUT:
-![GitHub Logo](dog.jpg) = 416*416
+![](dog.jpg = 416x416) 
 
 OUTPUT:
-![GitHub Logo](dogout.png)
+![](dogout.png)
 
