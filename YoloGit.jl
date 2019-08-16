@@ -14,7 +14,7 @@ include("outprocess.jl") # containing functions preparing output
 include("loadweights.jl") # containing functions loading weights to model
 
 using Knet: Knet, progress, progress!, gpu, KnetArray,
-relu,minibatch,conv4, pool, softmax,minibatch
+relu,minibatch,conv4, pool, softmax,minibatch,progress
 using Random, Glob, FileIO, DelimitedFiles, OffsetArrays
 using Images, ImageDraw, ImageFiltering, ImageTransformations, Colors
 using FreeTypeAbstraction
