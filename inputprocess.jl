@@ -1,21 +1,28 @@
+#Author: Yavuz Faruk Bakman
+#Date: 15/08/2019
 
 function inputandlabelsdir(dirlab,dirinput)
+    println("Collecting input and labels' directories")
     labels = []
     images = []
     for (root, dirs, files) in walkdir(mkpath(dirlab);)
         for file in files
-            tolabel = joinpath(root,file)
-            jpgFile = string(file[1:length(file)-3], "jpg")
-            toimage = joinpath(dirinput,jpgFile)
-            push!(labels,tolabel)
-            push!(images,toimage)
+            if occursin(".xml",file)
+                tolabel = joinpath(root,file)
+                jpgFile = string(file[1:length(file)-3], "jpg")
+                toimage = joinpath(dirinput,jpgFile)
+                push!(labels,tolabel)
+                push!(images,toimage)
+            end
         end
     end
+    println("Collecting done")
     return images,labels
 end
 
 function inputdir(inputdir)
     images  = []
+    println("Collecting input directories")
     for (root, dirs, files) in walkdir(mkpath(inputdir);)
         for file in files
             toimage = joinpath(root,file)
@@ -23,6 +30,7 @@ function inputdir(inputdir)
         end
     end
     return images
+    println("Collecting done")
 end
 
 function prepareinputlabels(inArr,labArr)
@@ -32,76 +40,92 @@ function prepareinputlabels(inArr,labArr)
     return in,lab,imgs
 end
 
+prepInput(inRes,imgs,data) =(prepInput!(inRes,imgs,args) for args in data)
+
+function prepInput!(inRes,imgs,args)
+    im, img_size, img_originalsize, padding = loadprepareimage(args,(416,416))
+    im_input = Array{Float32}(undef,416,416,3,1)
+    im_input[:,:,:,1] = permutedims(collect(channelview(im)),[2,3,1])
+    push!(inRes,im_input)
+    push!(imgs,im)
+end
+
 function prepareinput(inArr)
     inRes = Array{Array{Float32,4},1}()
     imgs= []
-    for i in 1:length(inArr)
-        im, img_size, img_originalsize, padding = loadprepareimage(inArr[i],(416,416))
-        im_input = Array{Float32}(undef,416,416,3,1)
-        im_input[:,:,:,1] = permutedims(collect(channelview(im)),[2,3,1])
-        push!(inRes,im_input)
-        push!(imgs,im)
-    end
+    println("Pre-processing images")
+    progress!(prepInput(inRes,imgs,inArr))
+    println("Pre-processing done")
     return cat(inRes...,dims=4),imgs
+end
+
+preplabels(labArr,labRes) =(preplabels!(args,labRes) for args in labArr)
+
+function preplabels!(args,labRes)
+    toPush = []
+    xdoc = parse_file(args)
+    xroot = root(xdoc)
+    ces = get_elements_by_tagname(xroot, "size")
+    width = parse(Int32,content(find_element(ces[1], "width")))
+    height = parse(Int32,content(find_element(ces[1], "height")))
+    push!(toPush,width)
+    push!(toPush,height)
+    ces = get_elements_by_tagname(xroot, "object")
+    for i in 1:length(ces)
+        obj = []
+        name= content(find_element(ces[i], "name"))
+        totaldic[name] = totaldic[name] + 1
+        #get xmin xmax ymin ymax
+        xmin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmin")))
+        xmax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmax")))
+        ymin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymin")))
+        ymax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymax")))
+        push!(obj,xmin)
+        push!(obj,ymin)
+        push!(obj,xmax-xmin)
+        push!(obj,ymax-ymin)
+        push!(obj,name)
+        push!(toPush,obj)
+    end
+    push!(labRes,toPush)
 end
 
 function preparelabels(labArr)
     labRes = []
-    for i in 1:length(labArr)
-        toPush = []
-        xdoc = parse_file(labArr[i])
-        xroot = root(xdoc)
-        ces = get_elements_by_tagname(xroot, "size")
-        width = parse(Int32,content(find_element(ces[1], "width")))
-        height = parse(Int32,content(find_element(ces[1], "height")))
-        push!(toPush,width)
-        push!(toPush,height)
-        ces = get_elements_by_tagname(xroot, "object")
-        for i in 1:length(ces)
-            obj = []
-            name= content(find_element(ces[i], "name"))
-            totaldic[name] = totaldic[name] + 1
-            #get xmin xmax ymin ymax
-            xmin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmin")))
-            xmax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmax")))
-            ymin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymin")))
-            ymax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymax")))
-            push!(obj,xmin)
-            push!(obj,ymin)
-            push!(obj,xmax-xmin)
-            push!(obj,ymax-ymin)
-            push!(obj,name)
-            push!(toPush,obj)
-        end
-        push!(labRes,toPush)
-    end
+    println("Preparing labels...")
+    progress!(preplabels(labArr,labRes))
+    println("Labels are done")
     return labRes
 end
 
-# return all tupples as(ImageWidth, ImageHeight,[x,y,objectWidth,objectHeight],ImageHeight,[x,y,objectWidth,objectHeight]..)
-# Basit mantık en üstü 416ya castle diğerinide ona göre padlersin
-function arrangelabels(lab,size)
-    for i in 1:length(lab)
-        w = lab[i][1]
-        h = lab[i][2]
-        for k in 3:length(lab[i])
-            m = max(w,h)
-            rate = size/m
-            if w >= h
-                pad = floor((size - h*rate)/2)
-                lab[i][k][1] = floor(lab[i][k][1]*rate)
-                lab[i][k][2] = floor(lab[i][k][2]*rate) + pad
-                lab[i][k][3] = floor(lab[i][k][3]*rate)
-                lab[i][k][4] = floor(lab[i][k][4]*rate)
-            else
-                pad = floor((size - w*rate)/2)
-                lab[i][k][1] = floor(lab[i][k][1]*rate) + pad
-                lab[i][k][2] = floor(lab[i][k][2]*rate)
-                lab[i][k][3] = floor(lab[i][k][3]*rate)
-                lab[i][k][4] = floor(lab[i][k][4]*rate)
-            end
+arrlabels(lab,size) =(arrlabels!(args,size) for args in lab)
+
+function arrlabels!(args,size)
+    w = args[1]
+    h = args[2]
+    for k in 3:length(args)
+        m = max(w,h)
+        rate = size/m
+        if w >= h
+            pad = floor((size - h*rate)/2)
+            args[k][1] = floor(args[k][1]*rate)
+            args[k][2] = floor(args[k][2]*rate) + pad
+            args[k][3] = floor(args[k][3]*rate)
+            args[k][4] = floor(args[k][4]*rate)
+        else
+            pad = floor((size - w*rate)/2)
+            args[k][1] = floor(args[k][1]*rate) + pad
+            args[k][2] = floor(args[k][2]*rate)
+            args[k][3] = floor(args[k][3]*rate)
+            args[k][4] = floor(args[k][4]*rate)
         end
     end
+end
+# return all tupples as(ImageWidth, ImageHeight,[x,y,objectWidth,objectHeight],ImageHeight,[x,y,objectWidth,objectHeight]..)
+function arrangelabels(lab,size)
+    println("Arranging labels...")
+    progress!(arrlabels(lab,size))
+    println("Labels are arranged")
     return lab
 end
 

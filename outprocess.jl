@@ -1,27 +1,37 @@
+#Author: Yavuz Faruk Bakman
+#Date: 15/08/2019
+
+saveOut(model,data,confth,iouth,res,number; record = true, location = "Output") = (saveOut!(model,args,confth,iouth,res,number; record = true, location = "Output") for args in data)
+function saveOut!(model,args,confth,iouth,res,number; record = true, location = "Output")
+    out = model(args[1])
+    out = postprocessing(out,confth,iouth)
+    a = out
+    push!(res,a)
+    im = args[2][1]
+    p2 = 416-length(axes(im)[1][1:end])
+    p1 = 416-length(axes(im)[2][1:end])
+    padding = (p1,p2)
+    for i in 1:length(a)
+        drawsquare(im,a[i][1],a[i][2],a[i][3],a[i][4],padding)
+        FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
+    end
+    number[1] = number[1] + 1
+    num = number[1]
+    if record
+        if !isdir(location)
+            mkdir(location)
+        end
+        save(string(location,"/$num.jpg"),im[1:end-p2,1:end-p1])
+    end
+end
+
+
 function saveoutput(model,data,confth,iouth; record = true, location = "Output")
     res = []
-    number = 0
-    for (x,y) in data
-        out = model(x)
-        out = postprocessing(out,confth,iouth)
-        a = out
-        push!(res,a)
-        im = y[1]
-        p2 = 416-length(axes(im)[1][1:end])
-        p1 = 416-length(axes(im)[2][1:end])
-        padding = (p1,p2)
-        for i in 1:length(a)
-            drawsquare(im,a[i][1],a[i][2],a[i][3],a[i][4],padding)
-            FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
-        end
-        number = number + 1
-        if record
-            if !isdir(location)
-                mkdir(location)
-            end
-            save(string(location,"/$number.jpg"),im[1:end-p2,1:end-p1])
-        end
-    end
+    number = [0]
+    println("Processing Input and Saving...")
+    progress!(saveOut(model,data,confth,iouth,res,number; record = true, location = "Output"))
+    println("Saved all output")
     return res
 end
 
@@ -37,6 +47,23 @@ function drawsquare(im,x,y,w,h,padding)
     draw!(im, LineSegment(Point(x,y+h), Point(x+w,y+h)))
 end
 
+acc(model,data,confth,iouth,iou,predictions) =(acc!(model,args,confth,iouth,iou,predictions) for args in data)
+
+function acc!(model,args,confth,iouth,iou,predictions)
+    out = model(args[1])
+    out = postprocessing(out,confth,iouth)
+    check = zeros(length(args[2][1])-2)
+    sort!(out,by = x-> x[2],rev=true)
+    for k in 1:length(out)
+        tp,loc = istrue(out[k],args[2][1][3:length(args[2][1])],check,iou)
+        push!(predictions[numsdic[out[k][5]]],(tp,out[k][6]))
+        if tp
+            check[loc] = 1
+        end
+    end
+end
+
+
 function accuracy(model,data,confth,iouth,iou)
     predictions = Dict("aeroplane"=>[],"bicycle"=>[],"bird"=>[], "boat"=>[],
                     "bottle"=>[],"bus"=>[],"car"=>[],"cat"=>[],"chair"=>[],
@@ -46,19 +73,12 @@ function accuracy(model,data,confth,iouth,iou)
                     "bottle"=>0.0,"bus"=>0.0,"car"=>0.0,"cat"=>0.0,"chair"=>0.0,
                     "cow"=>0.0,"diningtable"=>0.0,"dog"=>0.0,"horse"=>0.0,"motorbike"=>0.0,
                     "person"=>0.0,"pottedplant"=>0.0,"sheep"=>0.0,"sofa"=>0.0,"train"=>0.0,"tvmonitor"=>0.0)
-    for (x,y) in data
-        out = model(x)
-        out = postprocessing(out,confth,iouth)
-        check = zeros(length(y[1])-2)
-        sort!(out,by = x-> x[2],rev=true)
-        for k in 1:length(out)
-            tp,loc = istrue(out[k],y[1][3:length(y[1])],check,iou)
-            push!(predictions[numsdic[out[k][5]]],(tp,out[k][6]))
-            if tp
-                check[loc] = 1
-            end
-        end
-    end
+
+    println("Processing Input...")
+    progress!(acc(model,data,confth,iouth,iou,predictions))
+    println("Processing done")
+
+    println("Calculating accuracy...")
     for key in keys(predictions)
         sort!(predictions[key], by = x ->x[2],rev = true)
         tp = 0
@@ -94,7 +114,8 @@ function accuracy(model,data,confth,iouth,iou)
             sum = sum + (preRecall[i][2]-preRecall[i-1][2]) * preRecall[i][1]
         end
             apdic[key] = sum
-        end
+    end
+    println("Calculated")
     return apdic
 end
 

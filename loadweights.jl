@@ -1,3 +1,6 @@
+#Author: Yavuz Faruk Bakman
+#Date: 15/08/2019
+
 flipkernel(x) = x[end:-1:1, end:-1:1, :, :]
 
 function updateconv!(c,gama,mean,varriance)
@@ -16,6 +19,7 @@ end
 
 
 function getweights(model, file)
+    println("Loading weights")
     readconstants!(f)
     #First Conv layer
     loadconv!(model.layers[1],file,3,3,3,16)
@@ -48,6 +52,7 @@ function getweights(model, file)
         model.layers[16].b = KnetArray(model.layers[16].b)
         model.layers[13].w = KnetArray(model.layers[13].w)
     end
+    println("Weights loaded")
 end
 
 
