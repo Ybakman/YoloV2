@@ -124,10 +124,7 @@ function postprocessing(out,confth,iouth)
                 w = exp(tw) * anchors[b][1] * RATE
                 h = exp(th) * anchors[b][2] * RATE
                 conf = sigmoid(tc)
-                classScores = Array{Float32}(UndefInitializer(),20);
-                for i in channel+6:channel+25
-                    classScores[i-channel-5] = out[cy,cx,i,1]
-                end
+                classScores = out[cy,cx,channel+6:channel+25,1]
                 classScores = softmax(classScores)
                 classNo = argmax(classScores)
                 bestScore = classScores[classNo]
