@@ -1,7 +1,9 @@
 #Author: Yavuz Faruk Bakman
 #Date: 15/08/2019
 
+#process the input and save into given directory
 saveOut(model,data,confth,iouth,res,number; record = true, location = "Output") = (saveOut!(model,args,confth,iouth,res,number; record = true, location = "Output") for args in data)
+
 function saveOut!(model,args,confth,iouth,res,number; record = true, location = "Output")
     out = model(args[1])
     out = postprocessing(out,confth,iouth)
@@ -24,8 +26,8 @@ function saveOut!(model,args,confth,iouth,res,number; record = true, location = 
         save(string(location,"/$num.jpg"),im[1:end-p2,1:end-p1])
     end
 end
-
-
+#confth => confidence score threshold. 0.3 is recommended
+#iouth => intersection over union threshold. if 2 images overlap more than this threshold, one of them is removed
 function saveoutput(model,data,confth,iouth; record = true, location = "Output")
     res = []
     number = [0]
@@ -35,6 +37,7 @@ function saveoutput(model,data,confth,iouth; record = true, location = "Output")
     return res
 end
 
+#draw square to given image
 function drawsquare(im,x,y,w,h,padding)
     x = Int32(round(x))-padding[1]
     y = Int32(round(y))-padding[2]
@@ -47,6 +50,7 @@ function drawsquare(im,x,y,w,h,padding)
     draw!(im, LineSegment(Point(x,y+h), Point(x+w,y+h)))
 end
 
+#Calculates accuracy for Voc Dataset
 acc(model,data,confth,iouth,iou,predictions) =(acc!(model,args,confth,iouth,iou,predictions) for args in data)
 
 function acc!(model,args,confth,iouth,iou,predictions)
@@ -62,8 +66,9 @@ function acc!(model,args,confth,iouth,iou,predictions)
         end
     end
 end
-
-
+#confth => confidence score threshold. 0.0 for calculating accuracy
+#iouth => intersection over union threshold. if 2 images overlap more than this threshold, one of them is removed
+#iou => intersection over union. True positive threshold
 function accuracy(model,data,confth,iouth,iou)
     predictions = Dict("aeroplane"=>[],"bicycle"=>[],"bird"=>[], "boat"=>[],
                     "bottle"=>[],"bus"=>[],"car"=>[],"cat"=>[],"chair"=>[],
@@ -119,6 +124,7 @@ function accuracy(model,data,confth,iouth,iou)
     return apdic
 end
 
+#Checks if given prediction is true positive or false negative
 function istrue(prediction,labels,check,iou)
     min = iou
     result = false
@@ -133,6 +139,7 @@ function istrue(prediction,labels,check,iou)
     return result ,location
 end
 
+#Displays an image's output on IDE
 function displaytest(file,model; record = false)
     im, img_size, img_originalsize, padding = loadprepareimage(file,(416,416))
     im_input = Array{Float32}(undef,416,416,3,1)

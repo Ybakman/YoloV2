@@ -1,6 +1,7 @@
 #Author: Yavuz Faruk Bakman
 #Date: 15/08/2019
 
+#collects all labels and images' directories
 function inputandlabelsdir(dirlab,dirinput)
     println("Collecting input and labels' directories")
     labels = []
@@ -20,6 +21,7 @@ function inputandlabelsdir(dirlab,dirinput)
     return images,labels
 end
 
+#collects input directories
 function inputdir(inputdir)
     images  = []
     println("Collecting input directories")
@@ -33,6 +35,7 @@ function inputdir(inputdir)
     println("Collecting done")
 end
 
+#prepares input and its' labels
 function prepareinputlabels(inArr,labArr)
     in,imgs = prepareinput(inArr)
     lab = preparelabels(labArr)
@@ -61,6 +64,7 @@ end
 
 preplabels(labArr,labRes) =(preplabels!(args,labRes) for args in labArr)
 
+#prepares labels
 function preplabels!(args,labRes)
     toPush = []
     xdoc = parse_file(args)
@@ -130,7 +134,7 @@ function arrangelabels(lab,size)
 end
 
 
-
+#prepares an image as given shapes
 function loadprepareimage(img_path::String,img_shape::Tuple{Int,Int})
     #Extract image
     img = load(img_path)

@@ -178,7 +178,7 @@ end
 #Load pre-trained weights into the model
 f = open(WEIGHTS_FILE)
 getweights(model,f)
-
+close(f)
 #=User guide
 inputandlabelsdir => takes Voc labels and inputs folder location respectively and returns 2 arrays
 images directories and their labels' directories.
@@ -195,13 +195,16 @@ prepareinput => takes the array of directories of the images and returns 416*416
 #prepare data for accuracy
 images,labels = inputandlabelsdir(ACC_OUT,ACC_INPUT)
 in,out,imgs = prepareinputlabels(images,labels)
-
+print("input for accuracy:  ")
+println(summary(in))
 #prepare data for saving process
 indir = inputdir(INPUT)
 inp,images = prepareinput(indir)
-
+print("input for saving:  ")
+println(summary(inp))
 #Minibatching process
 accdata = minibatch(in,out,MINIBATCH_SIZE;xtype = xtype)
+
 drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
 savedata = minibatch(inp,images,MINIBATCH_SIZE; xtype = xtype)
 
@@ -224,5 +227,3 @@ display(AP)
 #return output as same with above example
 #It also saves the result of the images into output folder.
 @time result2 = saveoutput(model,savedata,0.3,0.3; record = true, location = "Output")
-
-close(f)

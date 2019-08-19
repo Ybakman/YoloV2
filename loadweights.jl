@@ -1,8 +1,10 @@
 #Author: Yavuz Faruk Bakman
 #Date: 15/08/2019
 
+#Flips given kernel
 flipkernel(x) = x[end:-1:1, end:-1:1, :, :]
 
+#Applies batch-normalization to given convolutional layer
 function updateconv!(c,gama,mean,varriance)
 gama4 = reshape(gama,1,1,1,:)
 varriance4 = reshape(varriance,1,1,1,:)
@@ -17,7 +19,7 @@ c.b = c.b .- (gama3 .* mean3 ./ sqrt.(varriance3 .+ a))
 return c.w ,c.b
 end
 
-
+#loads layers' weights from given file
 function getweights(model, file)
     println("Loading weights")
     readconstants!(f)
@@ -55,7 +57,7 @@ function getweights(model, file)
     println("Weights loaded")
 end
 
-
+#loads the file to given convolutional layer and updates it by batch-normalization
 function loadconv!(c,file,d1,d2,d3,d4)
     read!(file, c.b)
     gama= Array{Float32}(UndefInitializer(), d4);
@@ -76,6 +78,7 @@ function loadconv!(c,file,d1,d2,d3,d4)
     end
 end
 
+#read constant and unnecessary numbers from the file
 function readconstants!(file)
     major  = read(f,Int32)
     minor = read(f,Int32)
