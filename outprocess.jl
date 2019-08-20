@@ -139,6 +139,16 @@ function istrue(prediction,labels,check,iou)
     return result ,location
 end
 
+function calculatemean(dict)
+    sum = 0
+    number = 0
+    for key in keys(dict)
+        sum = sum + dict[key]
+        number = number + 1
+    end
+    return sum/number
+end
+
 #Displays an image's output on IDE
 function displaytest(file,model; record = false)
     im, img_size, img_originalsize, padding = loadprepareimage(file,(416,416))

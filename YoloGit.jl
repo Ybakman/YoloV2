@@ -216,7 +216,8 @@ displaytest(EXAMPLE_INPUT,model; record = false)
 #if two predictions overlap more than 0.3, one of them is removed
 @time AP = accuracy(model,accdata,0.0,0.3,0.5)
 display(AP)
-
+print("Mean average precision: ")
+println(calculatemean(AP))
 #output of Voc dataset.
 #return output as [ [(x,y,width,height,classNumber,confidenceScore),(x,y,width,height,classNumber,confidenceScore)...] ,[(x,y,width,height,classNumber,confidenceScore),(x,y,width,height,classNumber,confidenceScore)..],...]
 #save the output images into given location
