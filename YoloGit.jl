@@ -147,7 +147,7 @@ function nonmaxsupression(results,iouth)
         k = i+1
         while k <= length(results)
             if ioumatch(results[i][1],results[i][2],results[i][3],results[i][4],
-                results[k][1],results[k][2],results[k][3],results[k][4]) > iouth
+                results[k][1],results[k][2],results[k][3],results[k][4]) > iouth && results[i][5] == results[k][5]
                 deleteat!(results,k)
                 k = k - 1
             end
