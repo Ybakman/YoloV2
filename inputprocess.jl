@@ -78,18 +78,22 @@ function preplabels!(args,labRes)
     for i in 1:length(ces)
         obj = []
         name= content(find_element(ces[i], "name"))
-        totaldic[name] = totaldic[name] + 1
-        #get xmin xmax ymin ymax
-        xmin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmin")))
-        xmax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmax")))
-        ymin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymin")))
-        ymax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymax")))
-        push!(obj,xmin)
-        push!(obj,ymin)
-        push!(obj,xmax-xmin)
-        push!(obj,ymax-ymin)
-        push!(obj,name)
-        push!(toPush,obj)
+        difficult = content(find_element(ces[i], "difficult"))
+        if difficult == 0
+            totaldic[name] = totaldic[name] + 1
+            #get xmin xmax ymin ymax
+            xmin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmin")))
+            xmax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmax")))
+            ymin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymin")))
+            ymax = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"ymax")))
+            push!(obj,xmin)
+            push!(obj,ymin)
+            push!(obj,xmax-xmin)
+            push!(obj,ymax-ymin)
+            push!(obj,name)
+            push!(toPush,obj)
+        end
+
     end
     push!(labRes,toPush)
 end
