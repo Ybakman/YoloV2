@@ -79,7 +79,7 @@ function preplabels!(args,labRes)
         obj = []
         name= content(find_element(ces[i], "name"))
         difficult = content(find_element(ces[i], "difficult"))
-        if difficult == 0
+        if difficult == "0"
             totaldic[name] = totaldic[name] + 1
             #get xmin xmax ymin ymax
             xmin = parse(Int32,content(find_element(find_element(ces[i], "bndbox"),"xmin")))
