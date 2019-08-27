@@ -76,7 +76,7 @@ Let's assume we have a matrix as (d1,d2,depth,minibatch_size)
                                               
 4- Lastly, reshape again into => (d1,d2,depth,minibatch_size)
 
-Now, we made padding on the right and bottom side. If you want to make it on left and top side
+Now, we made pooling with asymmetric padding on the right and bottom side. If you want to make it on left and top side
 apply this conv layer =>  0 0 
                           0 1
 
