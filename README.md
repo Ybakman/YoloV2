@@ -66,6 +66,7 @@ An alternative solution for asymmetric padding on pooling
 We solved the asymmetric padding process in the following 4 steps:
 Let's assume we have a matrix as (d1,d2,depth,minibatch_size)
 
+```
 1- Apply symmetric padding = 1 with the pooling function
 2- reshape it into => (d1,d2,1,minibatch_size*depth)
 3- apply the following convolutional layer => 1 0  with stride = 1, padding = 0
@@ -78,4 +79,4 @@ apply this conv layer =>  0 0
 
 The last 3 steps are implemented in YoloPad(x) function
 The symmetric padding part is implemented in the pooling function just before Yolopad(x) 
-
+```
