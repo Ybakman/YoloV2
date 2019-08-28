@@ -79,11 +79,8 @@ function accuracy(model,data,confth,iouth,iou)
                     "cow"=>0.0,"diningtable"=>0.0,"dog"=>0.0,"horse"=>0.0,"motorbike"=>0.0,
                     "person"=>0.0,"pottedplant"=>0.0,"sheep"=>0.0,"sofa"=>0.0,"train"=>0.0,"tvmonitor"=>0.0)
 
-    println("Processing Input...")
-    progress!(acc(model,data,confth,iouth,iou,predictions))
-    println("Processing done")
-
     println("Calculating accuracy...")
+    progress!(acc(model,data,confth,iouth,iou,predictions))
     for key in keys(predictions)
         sort!(predictions[key], by = x ->x[2],rev = true)
         tp = 0
