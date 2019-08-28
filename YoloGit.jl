@@ -198,7 +198,6 @@ function main(args=ARGS)
     end
     println(s.description)
     o = parse_args(args[2:end], s; as_symbols=true)
-    println(o[:iou])
     if in("accuracy", args)
         #=User guide
         inputandlabelsdir => takes Voc labels and inputs folder location respectively and returns 2 arrays
