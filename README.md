@@ -12,6 +12,15 @@ If you want to see accuracy on Voc Dataset 2007, download the dataset by:
 $ wget https://pjreddie.com/media/files/VOCtrainval_06-Nov-2007.tar
   tar xf VOCtrainval_06-Nov-2007.tar
 ```
+and run
+```
+julia YoloGit.jl accuracy 
+```
+if you want to save Voc dataset output
+run
+```
+julia YoloGit.jl accuracy --record true
+```
 If you want to use Voc Dataset 2012
 ```
 $ wget https://pjreddie.com/media/files/VOCtrainval_11-May-2012.tar
@@ -23,33 +32,20 @@ ACC_INPUT = "VOCdevkit/VOC2012/JPEGImages"
 ACC_OUT =   "VOCdevkit/VOC2012/Annotations"
 ```
 
-If you don't want to see accuracy, do not download Voc-dataset and you can just comment out following lines in the code:
-```
-images,labels = inputandlabelsdir(ACC_OUT,ACC_INPUT)
-in,out,imgs = prepareinputlabels(images,labels)
-
-accdata = minibatch(in,out,MINIBATCH_SIZE;xtype = xtype)
-drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
-
-@time AP = accuracy(model,accdata,0.0,0.3,0.5)
-@time result = saveoutput(model,drawdata,0.3,0.3; record = true, location = "VocResult")
-display(AP)
-```
 Fill the Input folder with jpg images. The program prepares output and put them into output folder. If you want you can save output into another folder.
 
-Lastly, run the code by
+run the code by
 ```
-julia YoloGit.jl
+julia YoloGit.jl saveout --record true
 ```
-
-The code can:
-
-1-Calculate accuracy on Voc Dataset
-
-2-Tak the images and saves the output into the folder
-
-3-Take an example image and diplay the output on the IDE.
-
+If you want to display one image and save it, you can run
+```
+julia YoloGit.jl display --record true
+```
+To change thresholds, look at the guide by
+```
+julia YoloGit.jl --help
+```
 Here is an example of input and output:
 
 INPUT:
