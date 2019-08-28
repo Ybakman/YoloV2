@@ -2,7 +2,7 @@
 #Date: 15/08/2019
 
 #process the input and save into given directory
-saveOut(model,data,confth,iouth,res,number; record = true, location = "Output") = (saveOut!(model,args,confth,iouth,res,number; record = true, location = "Output") for args in data)
+saveOut(model,data,confth,iouth,res,number; record = true, location = "Output") = (saveOut!(model,args,confth,iouth,res,number; record = record, location = location) for args in data)
 
 function saveOut!(model,args,confth,iouth,res,number; record = true, location = "Output")
     out = model(args[1])
@@ -32,7 +32,7 @@ function saveoutput(model,data,confth,iouth; record = true, location = "Output")
     res = []
     number = [0]
     println("Processing Input and Saving...")
-    progress!(saveOut(model,data,confth,iouth,res,number; record = true, location = "Output"))
+    progress!(saveOut(model,data,confth,iouth,res,number; record = record, location = location))
     println("Saved all output")
     return res
 end
