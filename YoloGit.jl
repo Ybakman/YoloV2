@@ -175,10 +175,7 @@ function ioumatch(x1,y1,w1,h1,x2,y2,w2,h2)
         return intersec/(w1*h1+w2*h2-intersec)
 end
 
-#Load pre-trained weights into the model
-f = open(WEIGHTS_FILE)
-getweights(model,f)
-close(f)
+
 
 function main(args=ARGS)
     s = ArgParseSettings()
@@ -197,6 +194,10 @@ function main(args=ARGS)
        return
     end
     println(s.description)
+    #Load pre-trained weights into the model
+    f = open(WEIGHTS_FILE)
+    getweights(model,f)
+    close(f)
     o = parse_args(args[2:end], s; as_symbols=true)
     if in("accuracy", args)
         #=User guide
