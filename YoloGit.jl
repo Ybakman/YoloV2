@@ -5,7 +5,7 @@
 
 #Load necessary packages
 using Pkg; for p in ("Knet","Random","Glob","FileIO","DelimitedFiles","OffsetArrays","Images",
-"ImageDraw","ImageMagick","ImageFiltering","ImageTransformations","Colors","FreeTypeAbstraction","QuartzImageIO","LightXML");
+"ImageDraw","ImageMagick","ImageFiltering","ImageTransformations","Colors","FreeTypeAbstraction","QuartzImageIO","LightXML","ArgParse");
 haskey(Pkg.installed(),p) || Pkg.add(p); end
 
 #Include related files.
@@ -19,7 +19,7 @@ using Random, Glob, FileIO, DelimitedFiles, OffsetArrays
 using Images, ImageDraw, ImageFiltering, ImageTransformations, Colors
 using FreeTypeAbstraction
 using LightXML
-using ImageMagick
+using ImageMagick,ArgParse
 
 face = newface("DroidSansMono.ttf") #Font type
 xtype=(Knet.gpu()>=0 ? Knet.KnetArray{Float32} : Array{Float32})#if gpu exists run on gpu
