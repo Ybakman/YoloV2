@@ -58,6 +58,7 @@ OUTPUT:
   <img src="dogout.png" width="416" height="416">
 </p> 
 
+##Asymmetric Padding
 An alternative solution for asymmetric padding on pooling.
 We solved the asymmetric padding process in the following 4 steps:
 Let's assume we have a matrix as (d1,d2,depth,minibatch_size)
