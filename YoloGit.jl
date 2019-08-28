@@ -179,52 +179,75 @@ end
 f = open(WEIGHTS_FILE)
 getweights(model,f)
 close(f)
-#=User guide
-inputandlabelsdir => takes Voc labels and inputs folder location respectively and returns 2 arrays
-images directories and their labels' directories.
 
-prepareinputlabels => takes images and labels directories and returns 3 arrays
-input as 416*416*3*totalImage and
-labels as tupple of arrays.
-tupples are designed as (ImageWidth, ImageHeight,[x,y,objectWidth,objectHeight],[x,y,objectWidth,objectHeight]..)
-images are padded version of given images.
+function main(args=ARGS)
+    s = ArgParseSettings()
+    s.description="YoloGit.jl Yavuz Bakman,2019. Tiny Yolo V2 implementation by Knet framework"
+    s.exc_handler=ArgParse.debug_handler
+    @add_arg_table s begin
+        ("--iou"; arg_type=Float32; default=Float32(0.3); help="If two predictions overlap more than this threshold, one of them is removed")
+        ("--iouth"; arg_type=Float32; default=Float32(0.5); help="The threshold for accuracy calculation. If prediction and ground truth overlap more than this threshold, the prediction is counted as true positive, otherwise false positive")
+        ("--confth"; arg_type=Float32; default=Float32(0.3); help="The threshold for confidence score. If one prediction's score is more than this threshold, It is taken")
+        ("--record"; arg_type= Bool; default=false; help="Sets whether output is saved")
+        ("--directory"; arg_type=String; default="Output"; help="The location for saving the output")
+    end
+    isa(args, AbstractString) && (args=split(args))
+    if in("--help", args) || in("-h", args)
+       ArgParse.show_help(s; exit_when_done=false)
+       return
+    end
+    println(s.description)
+    o = parse_args(args[2:end], s; as_symbols=true)
+    println(o[:iou])
+    if in("accuracy", args)
+        #=User guide
+        inputandlabelsdir => takes Voc labels and inputs folder location respectively and returns 2 arrays
+        images directories and their labels' directories.
 
-inputdir => takes the directory of input for saving output and returns array of directories of the images
-prepareinput => takes the array of directories of the images and returns 416*416*3*totalImage. =#
+        prepareinputlabels => takes images and labels directories and returns 3 arrays
+        input as 416*416*3*totalImage and
+        labels as tupple of arrays.
+        tupples are designed as (ImageWidth, ImageHeight,[x,y,objectWidth,objectHeight],[x,y,objectWidth,objectHeight]..)
+        images are padded version of given images.
 
-#prepare data for accuracy
-images,labels = inputandlabelsdir(ACC_OUT,ACC_INPUT)
-in,out,imgs = prepareinputlabels(images,labels)
-print("input for accuracy:  ")
-println(summary(in))
-#prepare data for saving process
-indir = inputdir(INPUT)
-inp,images = prepareinput(indir)
-print("input for saving:  ")
-println(summary(inp))
-#Minibatching process
-accdata = minibatch(in,out,MINIBATCH_SIZE;xtype = xtype)
+        inputdir => takes the directory of input for saving output and returns array of directories of the images
+        prepareinput => takes the array of directories of the images and returns 416*416*3*totalImage. =#
+        #prepare data for accuracy
+        images,labels = inputandlabelsdir(ACC_OUT,ACC_INPUT)
+        inp,out,imgs = prepareinputlabels(images,labels)
+        print("input for accuracy:  ")
+        println(summary(inp))
+        #Minibatching process
+        accdata = minibatch(inp,out,MINIBATCH_SIZE;xtype = xtype)
+        AP = accuracy(model,accdata,0.0,o[:iou],o[:iouth])
+        display(AP)
+        print("Mean average precision: ")
+        println(calculatemean(AP))
+        if o[:record] == true
+            drawdata = minibatch(inp,imgs,MINIBATCH_SIZE; xtype = xtype)
+            #output of Voc dataset.
+            #return output as [ [(x,y,width,height,classNumber,confidenceScore),(x,y,width,height,classNumber,confidenceScore)...] ,[(x,y,width,height,classNumber,confidenceScore),(x,y,width,height,classNumber,confidenceScore)..],...]
+            #save the output images into given location
+            result = saveoutput(model,drawdata,o[:confth],o[:iou]; record = true, location = "VocResult")
+        end
+    end
+    if in("display", args)
+        #Display one test image
+        displaytest(EXAMPLE_INPUT,model; record = o[:record])
+    end
+    if in("saveout", args)
+        #prepare data for saving process
+        indir = inputdir(INPUT)
+        inp,images = prepareinput(indir)
+        print("input for saving:  ")
+        println(summary(inp))
+        #Minibatching process
+        savedata = minibatch(inp,images,MINIBATCH_SIZE; xtype = xtype)
+        #output of given input.
+        #return output as same with above example
+        #It also saves the result of the images into output folder.
+        @time result2 = saveoutput(model,savedata,0.3,0.3; record = o[:record], location = o[:directory])
+    end
+end
 
-drawdata = minibatch(in,imgs,MINIBATCH_SIZE; xtype = xtype)
-savedata = minibatch(inp,images,MINIBATCH_SIZE; xtype = xtype)
-
-#Display one test image
-displaytest(EXAMPLE_INPUT,model; record = false)
-
-#calculate accuracy. returns a dictionary containing all classes and their average precision score.
-#if overlapping is more than 0.5, prediction considered as true positive.
-#if two predictions overlap more than 0.3, one of them is removed
-@time AP = accuracy(model,accdata,0.0,0.3,0.5)
-display(AP)
-print("Mean average precision: ")
-println(calculatemean(AP))
-#output of Voc dataset.
-#return output as [ [(x,y,width,height,classNumber,confidenceScore),(x,y,width,height,classNumber,confidenceScore)...] ,[(x,y,width,height,classNumber,confidenceScore),(x,y,width,height,classNumber,confidenceScore)..],...]
-#save the output images into given location
-@time result = saveoutput(model,drawdata,0.3,0.3; record = true, location = "VocResult")
-
-
-#output of given input.
-#return output as same with above example
-#It also saves the result of the images into output folder.
-@time result2 = saveoutput(model,savedata,0.3,0.3; record = true, location = "Output")
+PROGRAM_FILE == "YoloGit.jl" && main(ARGS)
