@@ -79,10 +79,7 @@ end
 
 #leaky function
 function leaky(x)
-    if gpu() < 0
-        return max(convert(Float32,0.1*x),x)
-    end
-    return max(0.1*x,x)
+    return max(Float32(0.1)*x,x)
 end
 
 #Tiny Yolo V2 model configuration
