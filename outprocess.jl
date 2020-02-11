@@ -14,16 +14,22 @@ function saveOut!(model,args,confth,iouth,res,number; record = true, location = 
     r2 = length(axes(im)[2][1:end])
     p2 = 0
     p1 = 0
-    if r1> r2
-        p1 = size(args[1])[1] - Int32(r2 / (r1 / size(args[1])[1]))
-
+    if r1>= r2
+        p2 = size(args[1])[1] - Int32(r2 / (r1 / size(args[1])[1]))
+        r1 = size(args[1])[1]
+        r2 = size(args[1])[2]-p2
+        p2 = Int32(p2/2)
     end
     if r2> r1
-        p2 =  size(args[1])[2] - Int32(r1 / (r2 / size(args[1])[2]))
+        p1 =  size(args[1])[2] - Int32(r1 / (r2 / size(args[1])[2]))
+        r2 = size(args[1])[2]
+        r1 = size(args[1])[1]-p1
+        p1 = Int32(p1/2)
     end
-    padding = (p1,p2)
+    padding = (p2,p1)
     for i in 1:length(a)
-        norm = convertnormal(a,i,size(args[1]),size(args[2][1]),padding)
+        tup = r1,r2
+        norm = convertnormal(a,i,tup,size(args[2][1]),padding)
         drawsquare(im,norm[1],norm[2],norm[3],norm[4])
         FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(norm[2])),Int32(round(norm[1])),halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
     end
@@ -159,8 +165,6 @@ end
 #Displays an image's output on IDE
 function displaytest(file,model; record = false)
     im, img_size, img_originalsize, padding,imgOrg = loadprepareimage(file,(416,416))
-    println(img_size)
-    println(img_originalsize)
     imgOrg = Array{RGB4{Float64},2}(imgOrg)
     im_input = Array{Float32}(undef,416,416,3,1)
     im_input[:,:,:,1] = permutedims(collect(channelview(im)),[2,3,1]);
@@ -183,9 +187,5 @@ function convertnormal(a,i,imgsize,img_originalsize,padding)
     y = (a[i][2] -padding[2])*img_originalsize[2]/imgsize[2]
     w  = a[i][3] * img_originalsize[1]/imgsize[1]
     h = a[i][4] * img_originalsize[2]/imgsize[2]
-    println(x)
-    println(y)
-    println(w)
-    println(h)
     return x,y,w,h
 end

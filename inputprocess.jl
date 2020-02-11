@@ -155,7 +155,6 @@ function loadprepareimage(img_path::String,img_shape::Tuple{Int,Int})
     σ = map((o,n)->0.75*o/n, size(img), img_size)
     kern = KernelFactors.gaussian(σ)   # from ImageFiltering
     imgr = imresize(imfilter(img, kern, NA()), img_size)
-    println(summary(imgr))
     # Determine top and left padding
     vpad_top = floor(Int,(img_shape[1]-img_size[1])/2)
     hpad_left = floor(Int,(img_shape[2]-img_size[2])/2)

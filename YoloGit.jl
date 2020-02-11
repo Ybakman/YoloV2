@@ -172,7 +172,6 @@ function ioumatch(x1,y1,w1,h1,x2,y2,w2,h2)
         return intersec/(w1*h1+w2*h2-intersec)
 end
 
-
 function main(args=ARGS)
     s = ArgParseSettings()
     s.description="YoloGit.jl Yavuz Bakman,2019. Tiny Yolo V2 implementation by Knet framework"
@@ -245,5 +244,6 @@ function main(args=ARGS)
         @time result2 = saveoutput(model,savedata,0.3,0.3; record = o[:record], location = o[:directory])
     end
 end
+
 
 PROGRAM_FILE == "YoloGit.jl" && main(ARGS)
