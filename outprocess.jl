@@ -10,12 +10,22 @@ function saveOut!(model,args,confth,iouth,res,number; record = true, location = 
     a = out
     push!(res,a)
     im = args[2][1]
-    p2 = 416-length(axes(im)[1][1:end])
-    p1 = 416-length(axes(im)[2][1:end])
+    r1 = length(axes(im)[1][1:end])
+    r2 = length(axes(im)[2][1:end])
+    p2 = 0
+    p1 = 0
+    if r1> r2
+        p1 = size(args[1])[1] - Int32(r2 / (r1 / size(args[1])[1]))
+
+    end
+    if r2> r1
+        p2 =  size(args[1])[2] - Int32(r1 / (r2 / size(args[1])[2]))
+    end
     padding = (p1,p2)
     for i in 1:length(a)
-        drawsquare(im,a[i][1],a[i][2],a[i][3],a[i][4],padding)
-        FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
+        norm = convertnormal(a,i,size(args[1]),size(args[2][1]),padding)
+        drawsquare(im,norm[1],norm[2],norm[3],norm[4])
+        FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(norm[2])),Int32(round(norm[1])),halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
     end
     number[1] = number[1] + 1
     num = number[1]
@@ -23,7 +33,7 @@ function saveOut!(model,args,confth,iouth,res,number; record = true, location = 
         if !isdir(location)
             mkdir(location)
         end
-        save(string(location,"/$num.jpg"),im[1:end-p2,1:end-p1])
+        save(string(location,"/$num.jpg"),im)
     end
 end
 #confth => confidence score threshold. 0.3 is recommended
@@ -38,9 +48,9 @@ function saveoutput(model,data,confth,iouth; record = true, location = "Output")
 end
 
 #draw square to given image
-function drawsquare(im,x,y,w,h,padding)
-    x = Int32(round(x))-padding[1]
-    y = Int32(round(y))-padding[2]
+function drawsquare(im,x,y,w,h)
+    x = Int32(round(x))
+    y = Int32(round(y))
     w= Int32(round(w))
     h = Int32(round(h))
 
@@ -148,18 +158,34 @@ end
 
 #Displays an image's output on IDE
 function displaytest(file,model; record = false)
-    im, img_size, img_originalsize, padding = loadprepareimage(file,(416,416))
+    im, img_size, img_originalsize, padding,imgOrg = loadprepareimage(file,(416,416))
+    println(img_size)
+    println(img_originalsize)
+    imgOrg = Array{RGB4{Float64},2}(imgOrg)
     im_input = Array{Float32}(undef,416,416,3,1)
     im_input[:,:,:,1] = permutedims(collect(channelview(im)),[2,3,1]);
     if gpu() >= 0 im_input = KnetArray(im_input) end
     res = model(im_input)
     a = postprocessing(res,0.3,0.3)
     for i in 1:length(a)
-        drawsquare(im,a[i][1],a[i][2],a[i][3],a[i][4],padding)
-        FreeTypeAbstraction.renderstring!(im, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(a[i][2]))-padding[2],Int32(round(a[i][1]))-padding[1],halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
+        norm = convertnormal(a,i,img_size,img_originalsize,padding)
+        drawsquare(imgOrg,norm[1],norm[2],norm[3],norm[4])
+        FreeTypeAbstraction.renderstring!(imgOrg, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(norm[2])),Int32(round(norm[1])),halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
     end
     p1 = padding[1]
     p2 = padding[2]
-    display(im[1:end-p2,1:end-p1])
-    if record save("outexample.jpg",im[1:end-p2,1:end-p1]) end
+    display(imgOrg)
+    if record save("outexample.jpg",imgOrg) end
+end
+
+function convertnormal(a,i,imgsize,img_originalsize,padding)
+    x = (a[i][1] -padding[1])*img_originalsize[1]/imgsize[1]
+    y = (a[i][2] -padding[2])*img_originalsize[2]/imgsize[2]
+    w  = a[i][3] * img_originalsize[1]/imgsize[1]
+    h = a[i][4] * img_originalsize[2]/imgsize[2]
+    println(x)
+    println(y)
+    println(w)
+    println(h)
+    return x,y,w,h
 end

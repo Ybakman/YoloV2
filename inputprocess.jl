@@ -46,11 +46,12 @@ end
 prepInput(inRes,imgs,data) =(prepInput!(inRes,imgs,args) for args in data)
 
 function prepInput!(inRes,imgs,args)
-    im, img_size, img_originalsize, padding = loadprepareimage(args,(416,416))
+    im, img_size, img_originalsize, padding,imgOrg = loadprepareimage(args,(416,416))
     im_input = Array{Float32}(undef,416,416,3,1)
     im_input[:,:,:,1] = permutedims(collect(channelview(im)),[2,3,1])
+    imgOrg = Array{RGB4{Float64},2}(imgOrg)
     push!(inRes,im_input)
-    push!(imgs,im)
+    push!(imgs,imgOrg)
 end
 
 function prepareinput(inArr)
@@ -154,7 +155,7 @@ function loadprepareimage(img_path::String,img_shape::Tuple{Int,Int})
     σ = map((o,n)->0.75*o/n, size(img), img_size)
     kern = KernelFactors.gaussian(σ)   # from ImageFiltering
     imgr = imresize(imfilter(img, kern, NA()), img_size)
-
+    println(summary(imgr))
     # Determine top and left padding
     vpad_top = floor(Int,(img_shape[1]-img_size[1])/2)
     hpad_left = floor(Int,(img_shape[2]-img_size[2])/2)
@@ -167,5 +168,5 @@ function loadprepareimage(img_path::String,img_shape::Tuple{Int,Int})
 
     # Pad image
     imgrp = padarray(imgr, Fill(ColorTypes.RGB(0.0,0.0,0.0),(vpad_top,hpad_left),(vpad_bottom,hpad_right)))
-    return imgrp, img_size, img_originalsize, padding
+    return imgrp, img_size, img_originalsize, padding,img
 end
