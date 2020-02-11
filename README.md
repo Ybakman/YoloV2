@@ -56,7 +56,7 @@ INPUT:
 
 OUTPUT:
 <p align="center">
-  <img src="dogout.png" width="416" height="416">
+  <img src="show.png" width="416" height="416">
 </p> 
 
 ## Asymmetric Padding
