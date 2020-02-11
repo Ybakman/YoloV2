@@ -172,9 +172,6 @@ function ioumatch(x1,y1,w1,h1,x2,y2,w2,h2)
         return intersec/(w1*h1+w2*h2-intersec)
 end
 
-f = open(WEIGHTS_FILE)
-getweights(model,f)
-close(f)
 
 function main(args=ARGS)
     s = ArgParseSettings()
