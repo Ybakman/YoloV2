@@ -15,13 +15,13 @@ function saveOut!(model,args,confth,iouth,res,number; record = true, location = 
     p2 = 0
     p1 = 0
     if r1>= r2
-        p2 = size(args[1])[1] - Int32(r2 / (r1 / size(args[1])[1]))
+        p2 = size(args[1])[1] - Int32(floor(r2 / (r1 / size(args[1])[1])))
         r1 = size(args[1])[1]
         r2 = size(args[1])[2]-p2
         p2 = Int32(p2/2)
     end
     if r2> r1
-        p1 =  size(args[1])[2] - Int32(r1 / (r2 / size(args[1])[2]))
+        p1 =  size(args[1])[2] - Int32(floor(r1 / (r2 / size(args[1])[2])))
         r2 = size(args[1])[2]
         r1 = size(args[1])[1]-p1
         p1 = Int32(p1/2)
