@@ -168,6 +168,9 @@ function ioumatch(x1,y1,w1,h1,x2,y2,w2,h2)
         b = max(t1,t2)
         c = max(l1,l2)
         d = min(b1,b2)
+        if d < b
+           return 0
+        end
         intersec = (d-b)*(a-c)
         return intersec/(w1*h1+w2*h2-intersec)
 end
