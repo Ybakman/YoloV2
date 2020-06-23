@@ -174,7 +174,7 @@ function displaytest(file,model; record = false)
     for i in 1:length(a)
         norm = convertnormal(a,i,img_size,img_originalsize,padding)
         drawsquare(imgOrg,norm[1],norm[2],norm[3],norm[4])
-        FreeTypeAbstraction.renderstring!(imgOrg, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(norm[2])),Int32(round(norm[1])),halign=:hleft,valign=:vtop,bcolor=eltype(im)(1.0,1.0,1.0),fcolor=eltype(im)(0,0,0)) #use `nothing` to make bcolor transparent
+        FreeTypeAbstraction.renderstring!(imgOrg, string(numsdic[a[i][5]]), face, (14,14)  ,Int32(round(norm[2])),Int32(round(norm[1])),halign=:hleft,valign=:vtop,bcolor=eltype(imgOrg)(1.0,1.0,1.0),fcolor=eltype(imgOrg)(0,0,0)) #use `nothing` to make bcolor transparent
     end
     p1 = padding[1]
     p2 = padding[2]
